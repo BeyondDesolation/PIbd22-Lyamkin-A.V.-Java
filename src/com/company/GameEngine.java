@@ -10,7 +10,7 @@ public class GameEngine {
 
     public GameEngine(int width, int height, String title){
         gui = new WoPGUI(width, height, title, plane);
-
+        System.out.println("Да как работает этот гит");
     }
 
 }
