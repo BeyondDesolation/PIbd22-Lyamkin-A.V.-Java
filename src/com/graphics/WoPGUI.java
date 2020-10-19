@@ -1,6 +1,9 @@
 package com.graphics;
 
+import com.entity.Plane;
 import com.entity.PlaneWithRadar;
+import com.interfaces.ITransport;
+import com.utils.DetailsType;
 import com.utils.Direction;
 import com.utils.ImageReader;
 
@@ -29,23 +32,29 @@ public class WoPGUI {
     private JButton bUp;
     private JButton bRight;
     private JButton bDown;
-    private JButton bStart;
+    private JButton bStartPlane;
+    private JButton bStartPlaneWithRadar;
 
-    private JSpinner spinNumRadars;
 
-    private PlaneWithRadar plane;
+    private JSpinner spinNumDetails;
+    private JMenu menuTypeDetails;
 
-    public WoPGUI(int width, int height, String title, PlaneWithRadar plane) {
+    private ITransport plane;
+    private DetailsType detailsType;
+
+    public WoPGUI(int width, int height, String title, ITransport plane) {
 
         this.plane = plane;
+
 
         window = new JFrame(title);
         content = new Canvas();
         optionPanel = new JPanel();
-        mainFont = new Font("Area", Font.LAYOUT_NO_LIMIT_CONTEXT,16);
+        mainFont = new Font("Area", Font.LAYOUT_NO_LIMIT_CONTEXT, 16);
 
         bLeft = new JButton(new ImageIcon(ImageReader.loadImage("bLeft.png")));
         bLeft.setBackground(Color.GRAY);
+        //bLeft.setIcon(new ImageIcon("/GUI/bDown.png"));
         bLeft.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 bLeft_Click(e);
@@ -72,17 +81,26 @@ public class WoPGUI {
                 bDown_Click(e);
             }
         });
-        bStart = new JButton("Start");
-        bStart.setBackground(Color.GRAY);
-        bStart.addActionListener(new ActionListener() {
+        bStartPlane = new JButton("Create a plane");
+        bStartPlane.setBackground(Color.GRAY);
+        bStartPlane.setFont(mainFont);
+        bStartPlane.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                bStart_Click(e);
+                bStartPlane_Click(e);
+            }
+        });
+        bStartPlaneWithRadar = new JButton("Create a plane with radar");
+        bStartPlaneWithRadar.setBackground(Color.GRAY);
+        bStartPlaneWithRadar.setFont(mainFont);
+        bStartPlaneWithRadar.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                bStartPlaneWithRadar_Click(e);
             }
         });
 
-        spinNumRadars = new JSpinner(new SpinnerNumberModel(0,0,3,1));
-        spinNumRadars.setPreferredSize(new Dimension(50,40));
-        spinNumRadars.setFont(mainFont);
+        spinNumDetails = new JSpinner(new SpinnerNumberModel(0, 0, 3, 1));
+        spinNumDetails.setPreferredSize(new Dimension(50, 40));
+        spinNumDetails.setFont(mainFont);
 
         // optionPanel.setLayout(new GridLayout(5, 1, 3, 3));
         optionPanel.setLayout(new GridLayout(5, 1, 3, 3));
@@ -97,24 +115,69 @@ public class WoPGUI {
         controlPanel.add(bDown);
         controlPanel.add(bRight);
 
-        // Панель для выбора стартового сетапа и старта.
+        // Панель с кнопками для старта.
         JPanel startPanel = new JPanel();
-        startPanel.setLayout(new GridLayout(3, 1, 0,0));
-        startPanel.add(bStart);
+        startPanel.setLayout(new GridLayout(3, 1, 0, 0));
+        startPanel.add(bStartPlane);
+        startPanel.add(bStartPlaneWithRadar);
 
-        // Еще панель, чтобы подписать счетчик. Пора учить сложные лайауты...
-        JPanel panelWithSpinner = new JPanel();
-        JLabel label = new JLabel("Количество радаров");
-        label.setFont(mainFont);
-        panelWithSpinner.add(label);
-        panelWithSpinner.add(spinNumRadars);
-        startPanel.add(panelWithSpinner);
+        // Панель со спинерами для выбора стартового сетапа.
+        JPanel startPanel2 = new JPanel();
+        startPanel2.setLayout(new GridLayout(3, 1, 0, 0));
+
+        // Меню с выбором типа дополнительной рисовки
+        JMenuBar menuBar = new JMenuBar();
+        menuBar.setBackground(Color.LIGHT_GRAY);
+        menuBar.setFont(mainFont);
+
+        menuTypeDetails = new JMenu("Детали");
+        menuTypeDetails.setPreferredSize(new Dimension(120,60));
+        menuTypeDetails.setFont(mainFont);
+        JMenuItem itemOldRadar = new JMenuItem("Старый радар");
+        itemOldRadar.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                detailsType = DetailsType.OLD_RADAR;
+                menuTypeDetails.setText("Старый радар");
+            }
+        });
+        menuTypeDetails.add(itemOldRadar);
+        JMenuItem itemNewRadar = new JMenuItem("Новый радар");
+        itemNewRadar.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                detailsType = DetailsType.NEW_RADAR;
+                menuTypeDetails.setText("Новый радар");
+
+            }
+        });
+        menuTypeDetails.add(itemNewRadar);
+        JMenuItem itemLines = new JMenuItem("Полоски");
+        itemLines.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                detailsType = DetailsType.LINES;
+                menuTypeDetails.setText("Полоски");
+            }
+        });
+        menuTypeDetails.add(itemLines);
+
+        menuBar.add(menuTypeDetails);
+
+        // Еще панели, чтобы тип дополнения и его количество встали в строчку. Пора учить сложные лайауты...
+        JPanel panel = new JPanel();
+        panel.setLayout(new GridLayout(1,2,3,3));
+        panel.add(menuBar);
+        panel.add(spinNumDetails);
+        startPanel.add(panel);
+
 
         // Итоговая панель со всеми элементами управления.
         optionPanel.add(startPanel);
-        optionPanel.add(new Label());
-        optionPanel.add(new Label());
-        optionPanel.add(new Label());
+
+        optionPanel.add(new JLabel());
+        optionPanel.add(new JLabel());
+        optionPanel.add(new JLabel());
         optionPanel.add(controlPanel);
 
         window.setPreferredSize(new Dimension(width, height));
@@ -131,40 +194,51 @@ public class WoPGUI {
         buffer = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         bufferData = ((DataBufferInt) buffer.getRaster().getDataBuffer()).getData();
         bufferGraphics = buffer.getGraphics();
-        ((Graphics2D)bufferGraphics).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        ((Graphics2D) bufferGraphics).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         clearColor = 0Xffffffff;
     }
 
-    private void bStart_Click(ActionEvent e) {
+    private void bStartPlaneWithRadar_Click(ActionEvent e) {
         plane = new PlaneWithRadar
                 ((int) (Math.random() * 800 + 500),
                         (int) (Math.random() * 4000 + 2000),
-                        new Color(100, 150, 200),
                         new Color(50, 70, 140),
+                        new Color(100, 150, 200),
                         new Color(180, 200, 240),
                         true, true);
         plane.setPosition((int) (Math.random() * 200), (int) (Math.random() * 200), content.getWidth(), content.getHeight());
-        plane.setNumRadars((int)spinNumRadars.getValue());
+        ((PlaneWithRadar) plane).setTypeDetails(detailsType);
+        ((PlaneWithRadar) plane).setNumDetails((int) spinNumDetails.getValue());
+
+        render();
+    }
+
+    private void bStartPlane_Click(ActionEvent e) {
+        plane = new Plane((int) (Math.random() * 800 + 500),
+                (int) (Math.random() * 4000 + 2000),
+                new Color(50, 70, 140));
+
+        plane.setPosition((int) (Math.random() * 200), (int) (Math.random() * 200), content.getWidth(), content.getHeight());
         render();
     }
 
     private void bDown_Click(ActionEvent e) {
-        plane.movePlane(Direction.Down);
+        plane.move(Direction.Down);
         render();
     }
 
     private void bRight_Click(ActionEvent e) {
-        plane.movePlane(Direction.Right);
+        plane.move(Direction.Right);
         render();
     }
 
     private void bUp_Click(ActionEvent e) {
-        plane.movePlane(Direction.Up);
+        plane.move(Direction.Up);
         render();
     }
 
     private void bLeft_Click(ActionEvent e) {
-        plane.movePlane(Direction.Left);
+        plane.move(Direction.Left);
         render();
     }
 
@@ -178,7 +252,7 @@ public class WoPGUI {
 
     public void render() {
         clear(0XFFFFFFFF);
-        plane.render(getGraphics());
+        plane.draw(getGraphics());
         Graphics g = content.getGraphics();
         g.drawImage(buffer, 0, 0, null);
     }

@@ -1,12 +1,12 @@
 package com.utils;
 
-public enum RadarsNumber {
+public enum DetailsNumber {
     ONE,
     TWO,
     THREE,
     EMPTY;
 
-    public static RadarsNumber fromNumeric(int n){
+    public static DetailsNumber fromNumeric(int n){
         switch (n){
             case 1:
                 return ONE;

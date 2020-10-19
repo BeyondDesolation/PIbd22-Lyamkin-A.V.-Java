@@ -1,86 +1,62 @@
 package com.entity;
 
-import com.utils.Direction;
+import com.interfaces.IDopDraw;
+import com.utils.DetailsType;
 
 import java.awt.*;
 
-import static com.utils.Direction.*;
-
-public class PlaneWithRadar {
+public class PlaneWithRadar extends Plane {
     private boolean hasRadar;
     private boolean moreEngine;
     private int radarRage;
     public int numRadars;
 
-    private AdditionalRadars addRadars;
-
-    private int maxSpeed;
-    private int weight;
-
-    private int posX = 0;
-    private int posY = 0;
-
-    private int fieldHeight;
-    private int fieldWidth;
-
-    private final int planeHeight = 100;
-    private final int planeWidth = 200;
+    private IDopDraw dopDetails;
 
     public Color mainColor;
     public Color dopColor;
     public Color detailColor;
 
     public PlaneWithRadar(int maxSpeed, int weight, Color main, Color dop, Color dop2, boolean radar, boolean moreEngine) {
+        super(maxSpeed, weight, main, 200, 100);
         this.maxSpeed = maxSpeed;
-       this.weight = weight;
+        this.weight = weight;
         mainColor = main;
         dopColor = dop;
         detailColor = dop2;
         hasRadar = radar;
         this.moreEngine = moreEngine;
-        addRadars = new AdditionalRadars();
+
     }
 
-    public void setPosition(int x, int y, int width, int height) {
-        fieldHeight = height;
-        fieldWidth = width;
-        posX = x;
-        posY = y;
-        addRadars.setPosition(posX, posY);
-    }
-    public void setNumRadars(int num){
-        addRadars.setNumRadars(num);
-    }
-
-    public void movePlane(Direction direction) {
-        int step = maxSpeed * 100 / weight;
-        switch (direction) {
-            case Left:
-                if (posX - step > 0)
-                    posX -= step;
-                break;
-
-            case Up:
-                if (posY - step > 0)
-                    posY -= step;
-                break;
-
-            case Right:
-                if (posX + step < fieldWidth - planeWidth)
-                    posX += step;
-                break;
-
-            case Down:
-                if (posY + step < fieldHeight - planeHeight)
-                    posY += step;
-                break;
+    public void setTypeDetails(DetailsType detailsType) {
+        if (detailsType == DetailsType.OLD_RADAR) {
+            dopDetails = new AdditionalRadars();
+        } else if (detailsType == DetailsType.NEW_RADAR) {
+            dopDetails = new AdditionalRadarsV2();
+        } else if (detailsType == DetailsType.LINES) {
+            dopDetails = new AdditionalLines();
         }
-        addRadars.setPosition(posX, posY);
     }
 
-    public void render(Graphics2D g2) {
+    public void setNumDetails(int n) {
+        if (dopDetails != null)
+            dopDetails.setNumDetails(n);
+    }
+
+    public void draw(Graphics2D g2) {
+
+        int posX = (int) this.posX;
+        int posY = (int) this.posY;
+        super.draw(g2);
+
+        // Детали
+        if (dopDetails != null) {
+            dopDetails.draw(posX, posY, detailColor, g2);
+        }
+
         //хвост
-        g2.setPaint(mainColor);
+        g2.setPaint(dopColor);
         Polygon p1 = new Polygon();
         p1.addPoint(posX + 8, posY + 10);
         p1.addPoint(posX + 65, posY + 15);
@@ -91,43 +67,28 @@ public class PlaneWithRadar {
         p1.addPoint(posX + 8, posY + 10);
         g2.fillPolygon(p1);
 
-        //корпус
-        g2.setPaint(dopColor);
-        p1 = new Polygon();
-
-        p1.addPoint(posX + 50, posY + 60);
-        p1.addPoint(posX + 90, posY + 75);
-        p1.addPoint(posX + 120, posY + 80);
-        p1.addPoint(posX + 185, posY + 70);
-        p1.addPoint(posX + 195, posY + 65);
-        p1.addPoint(posX + 195, posY + 60);
-        p1.addPoint(posX + 180, posY + 50);
-        p1.addPoint(posX + 170, posY + 50);
-        p1.addPoint(posX + 160, posY + 45);
-        p1.addPoint(posX + 55, posY + 50);
-        g2.fillPolygon(p1);
 
         // Двигатели.
-        if(moreEngine){
-            // Ближе к кобине.
+        if (moreEngine) {
             g2.setPaint(detailColor);
+            // Ближе к хвосту.
             p1 = new Polygon();
-            p1.addPoint(posX + 100, posY + 58);
-            p1.addPoint(posX + 120, posY + 70);
-            p1.addPoint(posX + 125, posY + 58);
+            p1.addPoint(posX + 83, posY + 56);
+            p1.addPoint(posX + 103, posY + 68);
+            p1.addPoint(posX + 108, posY + 56);
             g2.fillPolygon(p1);
         }
-
-        // Ближе к хвосту.
+        // Двигатели.
+        // Ближе к кобине.
         p1 = new Polygon();
-        p1.addPoint(posX + 83, posY + 56);
-        p1.addPoint(posX + 103, posY + 68);
-        p1.addPoint(posX + 108, posY + 56);
+        p1.addPoint(posX + 100,  posY + 58);
+        p1.addPoint( posX + 120,  posY + 70);
+        p1.addPoint( posX + 125,  posY + 58);
         g2.fillPolygon(p1);
 
         //крылья
         p1 = new Polygon();
-        g2.setPaint(mainColor);
+        g2.setPaint(dopColor);
         p1.addPoint(posX + 37, posY + 58);
         p1.addPoint(posX + 140, posY + 50);
         p1.addPoint(posX + 145, posY + 60);
@@ -136,17 +97,14 @@ public class PlaneWithRadar {
         p1.addPoint(posX + 30, posY + 65);
         g2.fillPolygon(p1);
 
-        //радар
-        if (hasRadar) {
-            addRadars.draw(detailColor, g2);
-        }
+
     }
 
     public int getMaxSpeed() {
         return maxSpeed;
     }
 
-    public int getWeight() {
+    public float getWeight() {
         return weight;
     }
 
