@@ -5,7 +5,7 @@ import com.utils.Direction;
 
 import java.awt.*;
 
-abstract class Aircraft implements ITransport {
+public abstract class Aircraft implements ITransport {
 
     protected float posX;
     protected float posY;

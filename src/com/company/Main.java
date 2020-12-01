@@ -4,6 +4,6 @@ public class Main {
 
     public static void main(String[] args) {
 	// write your code here
-       GameEngine WoP = new GameEngine(1280, 720, "WoP");
+       GameEngine WoP = new GameEngine(1000, 700, "WoP");
     }
 }
