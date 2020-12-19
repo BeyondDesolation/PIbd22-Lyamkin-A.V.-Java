@@ -1,5 +1,6 @@
-package com.graphics;
+package com.windows;
 
+import com.entity.Aircraft;
 import com.entity.Plane;
 import com.entity.PlaneWithRadar;
 import com.interfaces.ITransport;
@@ -15,7 +16,7 @@ import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.util.Arrays;
 
-public class WoPGUI {
+public class FramePlane {
 
     private BufferedImage buffer;
     private int[] bufferData;
@@ -42,10 +43,7 @@ public class WoPGUI {
     private ITransport plane;
     private DetailsType detailsType;
 
-    public WoPGUI(int width, int height, String title, ITransport plane) {
-
-        this.plane = plane;
-
+    public FramePlane(int width, int height, String title) {
 
         window = new JFrame(title);
         content = new Canvas();
@@ -98,7 +96,7 @@ public class WoPGUI {
             }
         });
 
-        spinNumDetails = new JSpinner(new SpinnerNumberModel(0, 0, 3, 1));
+        spinNumDetails = new JSpinner(new SpinnerNumberModel(0, 0, 9, 1));
         spinNumDetails.setPreferredSize(new Dimension(50, 40));
         spinNumDetails.setFont(mainFont);
 
@@ -181,7 +179,7 @@ public class WoPGUI {
         optionPanel.add(controlPanel);
 
         window.setPreferredSize(new Dimension(width, height));
-        window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        window.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         window.setResizable(false);
 
         window.setLayout(new BorderLayout());
@@ -196,6 +194,11 @@ public class WoPGUI {
         bufferGraphics = buffer.getGraphics();
         ((Graphics2D) bufferGraphics).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         clearColor = 0Xffffffff;
+    }
+
+    public void setPlane(Aircraft plane){
+        this.plane = plane;
+        render();
     }
 
     private void bStartPlaneWithRadar_Click(ActionEvent e) {
@@ -251,6 +254,7 @@ public class WoPGUI {
     }
 
     public void render() {
+
         clear(0XFFFFFFFF);
         plane.draw(getGraphics());
         Graphics g = content.getGraphics();

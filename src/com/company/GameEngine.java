@@ -1,16 +1,17 @@
 package com.company;
 
 import com.entity.PlaneWithRadar;
-import com.graphics.WoPGUI;
+import com.windows.FramePlane;
+import com.windows.FrameAirfield;
 
 public class GameEngine {
     // Никто не знает, для чего существует этот класс...
-    private WoPGUI gui;
+    private FramePlane gui;
     private PlaneWithRadar plane;
+    private AirfieldFrame airfieldFrame;
+    private FrameAirfield frameAirfield;
 
     public GameEngine(int width, int height, String title){
-        gui = new WoPGUI(width, height, title, plane);
-
+        frameAirfield = new FrameAirfield(width, height, title);
     }
-
 }
